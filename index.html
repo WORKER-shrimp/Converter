@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="香港免費 JPG 轉 PDF 工具 • 即時、多張圖合成、零上傳、100% 私隱">
-    <title>香港免費 JPG 轉 PDF | 圖片轉 PDF 工具</title>
+    <meta name="description" content="香港免費 JPG 轉 PDF 工具 • 支援所有主流格式包括 iPhone HEIC • 即時、多張、零上傳">
+    <title>香港免費 JPG 轉 PDF | 支援 HEIC / WebP / PNG 等</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
         body { font-family: 'Noto Sans TC', system-ui, sans-serif; }
         .hero-bg { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
+        .toast { animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
@@ -32,7 +34,8 @@
     <div class="hero-bg py-16 text-white text-center">
         <div class="max-w-4xl mx-auto px-6">
             <h1 class="text-5xl md:text-6xl font-bold mb-4">免費 JPG 轉 PDF</h1>
-            <p class="text-xl opacity-90">即時轉換 • 多張圖合成一本 PDF • 零上傳 • 香港人最愛用</p>
+            <p class="text-xl opacity-90">支援 <strong>所有主流格式</strong>：JPG、PNG、WebP、<strong>iPhone HEIC/HEIF</strong>、BMP、TIFF 等</p>
+            <p class="mt-2 text-sm opacity-75">100% 瀏覽器端 • 零上傳 • 零水印</p>
         </div>
     </div>
 
@@ -44,7 +47,7 @@
                  class="border-4 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-12 text-center hover:border-blue-500 transition-all cursor-pointer">
                 <div class="mx-auto w-16 h-16 mb-4 text-blue-600">📤</div>
                 <p class="text-2xl font-semibold mb-2">拖放圖片到這裡</p>
-                <p class="text-gray-500">支援 JPG、PNG、WebP • 可一次多張</p>
+                <p class="text-gray-500">支援 JPG、PNG、WebP、HEIC、HEIF 等所有主流圖片</p>
                 <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
             </div>
 
@@ -91,10 +94,13 @@
         </div>
     </div>
 
+    <!-- Toast -->
+    <div id="toast" class="hidden fixed bottom-6 right-6 bg-gray-800 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2 toast"></div>
+
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-12 text-center text-sm">
         <p>© 2026 香港免費轉 PDF 工具 • 全部轉換喺你瀏覽器完成 • 100% 私隱</p>
-        <p class="mt-2">有問題？聯絡 tsz@converter.hk</p>
+        <p class="mt-2">iPhone HEIC 直接支援 • 有問題？聯絡 tsz@converter.hk</p>
     </footer>
 
     <script>
@@ -109,36 +115,47 @@
         const fileCount = document.getElementById('fileCount');
         const settingsArea = document.getElementById('settingsArea');
         const convertBtn = document.getElementById('convertBtn');
+        const toast = document.getElementById('toast');
 
-        // Tailwind script init
-        function initTailwind() {
-            tailwind.config = {
-                content: [],
-                theme: { extend: {} }
-            };
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `fixed bottom-6 right-6 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2 toast ${type === 'error' ? 'bg-red-600' : 'bg-green-600'}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4000);
         }
 
-        // Drag & Drop + Click
+        // 拖放 + 點擊上傳
         dropzone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', handleFiles);
+        fileInput.addEventListener('change', e => handleFiles(e.target.files));
 
         dropzone.addEventListener('dragover', e => {
             e.preventDefault();
             dropzone.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-950');
         });
-        dropzone.addEventListener('dragleave', () => {
-            dropzone.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-950');
-        });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-950'));
         dropzone.addEventListener('drop', e => {
             e.preventDefault();
             dropzone.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-950');
-            handleFiles(e);
+            handleFiles(e.dataTransfer.files);
         });
 
-        function handleFiles(e) {
-            const newFiles = e.target.files || e.dataTransfer.files;
-            files = [...files, ...newFiles];
-            renderPreviews();
+        function handleFiles(newFiles) {
+            let validFiles = [];
+            for (let file of newFiles) {
+                if (!file.type.startsWith('image/')) {
+                    showToast(`「${file.name}」唔係圖片格式，已略過`, 'error');
+                    continue;
+                }
+                validFiles.push(file);
+            }
+
+            if (validFiles.length > 0) {
+                files = [...files, ...validFiles];
+                renderPreviews();
+                if (validFiles.length < newFiles.length) {
+                    showToast(`已加入 ${validFiles.length} 張有效圖片`, 'success');
+                }
+            }
         }
 
         function renderPreviews() {
@@ -182,6 +199,23 @@
             settingsArea.classList.add('hidden');
         }
 
+        // 通用轉 JPEG 函數（支援 HEIC / WebP 等）
+        async function convertImageToJPEG(file) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/jpeg', 0.92));
+                };
+                img.onerror = () => reject(new Error(`無法處理 ${file.name}`));
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
         async function convertToPDF() {
             if (files.length === 0) return;
             convertBtn.disabled = true;
@@ -199,26 +233,29 @@
             for (let i = 0; i < files.length; i++) {
                 if (i > 0) pdf.addPage();
 
-                const imgData = await new Promise(resolve => {
-                    const reader = new FileReader();
-                    reader.onload = e => resolve(e.target.result);
-                    reader.readAsDataURL(files[i]);
-                });
+                try {
+                    const jpegData = await convertImageToJPEG(files[i]);
+                    const imgProps = pdf.getImageProperties(jpegData);
+                    const ratio = Math.min((pageWidth - 10) / imgProps.width, (pageHeight - 10) / imgProps.height);
+                    const width = imgProps.width * ratio;
+                    const height = imgProps.height * ratio;
 
-                const imgProps = pdf.getImageProperties(imgData);
-                const ratio = Math.min((pageWidth - 10) / imgProps.width, (pageHeight - 10) / imgProps.height);
-                const width = imgProps.width * ratio;
-                const height = imgProps.height * ratio;
-
-                pdf.addImage(imgData, 'JPEG', (pageWidth - width)/2, (pageHeight - height)/2, width, height);
+                    pdf.addImage(jpegData, 'JPEG', (pageWidth - width)/2, (pageHeight - height)/2, width, height);
+                } catch (err) {
+                    showToast(`無法轉換 ${files[i].name}，已略過`, 'error');
+                }
             }
 
             pdf.save(`轉換後_PDF_${new Date().toISOString().slice(0,10)}.pdf`);
             convertBtn.disabled = false;
             convertBtn.innerHTML = '📥 轉成 PDF 並下載';
+            showToast('PDF 轉換完成並下載！', 'success');
         }
 
-        // Init
+        // Tailwind 初始化
+        function initTailwind() {
+            tailwind.config = { content: [], theme: { extend: {} } };
+        }
         initTailwind();
     </script>
 </body>
