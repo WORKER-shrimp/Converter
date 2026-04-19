@@ -5,18 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Free Image to PDF Converter • Instant, private, and supports all formats including HEIC.">
     <title>PDF Converter - Free Image to PDF</title>
-    
+   
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    
+   
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        
+       
         .hero-bg { background: linear-gradient(135deg, #c52222 0%, #ef4444 100%); }
-        
-        /* 選項按鈕的選中狀態 */
+       
         .option-card.active {
             border-color: #dc2626 !important;
             background-color: #fff1f2;
@@ -24,18 +23,13 @@
         .option-card.active span, .option-card.active svg {
             color: #dc2626 !important;
         }
-
-        /* 拖拉排序時的視覺效果 */
         .sortable-ghost { opacity: 0.3; transform: scale(0.95); }
         .sortable-drag { cursor: grabbing !important; }
-
-        /* 隱藏滾動條但保持功能 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
-
     <nav class="bg-white border-b px-8 py-4 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="text-2xl font-bold text-red-600 flex items-center gap-2">
@@ -48,11 +42,10 @@
             </div>
         </div>
     </nav>
-
     <div class="hero-bg py-20 text-white text-center px-6">
         <h1 class="text-5xl md:text-7xl font-bold mb-6">Free Image to PDF</h1>
         <p class="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto leading-relaxed">
-            Supports **all major formats**: JPG, PNG, WebP, **iPhone HEIC/HEIF**, BMP, TIFF, etc.
+            Supports: JPG, PNG, WebP, BMP, TIFF, etc.
         </p>
         <div class="mt-4 flex justify-center gap-4 text-sm opacity-80">
             <span>100% Browser-based</span>
@@ -62,11 +55,10 @@
             <span class="bg-white/20 px-2 py-0.5 rounded">No Watermarks</span>
         </div>
     </div>
-
     <div class="max-w-4xl mx-auto px-6 -mt-16 mb-20">
         <div class="bg-white rounded-[2.5rem] shadow-2xl p-8 md:p-12 border border-white/50">
-            
-            <div id="dropzone" 
+           
+            <div id="dropzone"
                  class="group border-4 border-dashed border-gray-200 rounded-[2rem] p-12 text-center hover:border-red-500 hover:bg-red-50/50 transition-all cursor-pointer">
                 <div class="bg-red-100 text-red-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,7 +69,6 @@
                 <p class="text-gray-500">Supports JPG, PNG, WebP, HEIC, HEIF, and more</p>
                 <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
             </div>
-
             <div id="previewArea" class="mt-12 hidden">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-lg font-bold flex items-center gap-2">
@@ -88,10 +79,9 @@
                 </div>
                 <div id="previews" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4"></div>
             </div>
-
             <div id="settingsArea" class="mt-12 pt-12 border-t border-gray-100 hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    
+                   
                     <div>
                         <h4 class="text-gray-500 font-bold text-sm uppercase mb-4 tracking-wider">Page orientation</h4>
                         <div class="flex gap-4">
@@ -105,61 +95,73 @@
                             </button>
                         </div>
                     </div>
-
                     <div>
                         <h4 class="text-gray-500 font-bold text-sm uppercase mb-4 tracking-wider">Page size</h4>
                         <select id="pageSize" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-red-500 outline-none font-bold text-gray-700 appearance-none cursor-pointer">
-                            <option value="a4">A4 (297x210 mm)</option>
-                            <option value="letter">US Letter (215x279 mm)</option>
+                            <option value="a4" selected>A4 (297×210 mm)</option>
                             <option value="fit">Fit (Same page size as image)</option>
+                            <option value="custom">Custom size</option>
                         </select>
+                        <div id="customSizeInputs" class="mt-6 hidden">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-500 font-bold text-sm uppercase mb-2 tracking-wider">Width (px)</label>
+                                    <input type="number" id="customWidth" value="800" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-red-500 outline-none font-bold text-gray-700">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-500 font-bold text-sm uppercase mb-2 tracking-wider">Height (px)</label>
+                                    <input type="number" id="customHeight" value="600" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-red-500 outline-none font-bold text-gray-700">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
                     <div class="md:col-span-2">
                         <h4 class="text-gray-500 font-bold text-sm uppercase mb-4 tracking-wider">Margin</h4>
                         <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                            <button onclick="setMargin(0)" id="margin-0" class="option-card active flex-1 min-w-[120px] p-6 border-2 border-gray-100 rounded-2xl text-center transition">
+                            <button onclick="setMarginMode('no')" id="margin-no" class="option-card active flex-1 min-w-[120px] p-6 border-2 border-gray-100 rounded-2xl text-center transition">
                                 <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 4h16v16H4z"/></svg>
                                 <span class="text-sm font-bold">No margin</span>
                             </button>
-                            <button onclick="setMargin(10)" id="margin-10" class="option-card flex-1 min-w-[120px] p-6 border-2 border-gray-100 rounded-2xl text-center transition">
+                            <button onclick="setMarginMode('small')" id="margin-small" class="option-card flex-1 min-w-[120px] p-6 border-2 border-gray-100 rounded-2xl text-center transition">
                                 <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-dasharray="4 4" stroke-width="2" d="M4 4h16v16H4z"/></svg>
                                 <span class="text-sm font-bold">Small</span>
                             </button>
-                            <button onclick="setMargin(25)" id="margin-25" class="option-card flex-1 min-w-[120px] p-6 border-2 border-gray-100 rounded-2xl text-center transition">
-                                <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" stroke-width="2"/></svg>
-                                <span class="text-sm font-bold">Big</span>
+                            <button onclick="setMarginMode('custom')" id="margin-custom" class="option-card flex-1 min-w-[120px] p-6 border-2 border-gray-100 rounded-2xl text-center transition">
+                                <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" stroke-width="2"/><rect x="7" y="7" width="10" height="10" rx="1" stroke-width="1.5" stroke-dasharray="2 2"/></svg>
+                                <span class="text-sm font-bold">Custom margin</span>
                             </button>
+                        </div>
+                        <div id="customMarginInputs" class="mt-6 hidden">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-500 font-bold text-sm uppercase mb-2 tracking-wider">Width margin (px)</label>
+                                    <input type="number" id="marginWidth" value="25" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-red-500 outline-none font-bold text-gray-700">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-500 font-bold text-sm uppercase mb-2 tracking-wider">Height margin (px)</label>
+                                    <input type="number" id="marginHeight" value="25" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-red-500 outline-none font-bold text-gray-700">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="mt-8 flex items-center gap-3">
-                    <input type="checkbox" id="mergeCheck" checked class="w-6 h-6 accent-red-600 rounded cursor-pointer">
-                    <label for="mergeCheck" class="font-bold text-gray-700 cursor-pointer">Merge all images in one PDF file</label>
-                </div>
             </div>
-
             <button onclick="generatePDF()" id="convertBtn" class="mt-12 w-full bg-red-600 hover:bg-red-700 text-white text-xl font-extrabold py-6 rounded-3xl shadow-xl shadow-red-200 flex items-center justify-center gap-3 transition transform active:scale-[0.98] group">
                 <span id="btnText">Convert to PDF & Download</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 group-hover:translate-x-1 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
             </button>
-
         </div>
     </div>
-
     <footer class="bg-slate-900 text-white/50 py-16 text-center text-sm px-6">
         <p class="mb-2">© 2026 Free PDF Converter • All conversions happen in your browser • 100% Private</p>
-        <p>Direct HEIC support included • Questions? <a href="mailto:support@converter.com" class="text-white hover:underline">Contact support@converter.com</a></p>
+        <p>Direct HEIC support included • Questions? <a href="mailto:https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="text-white hover:underline">Contact me</a></p>
     </footer>
-
     <script>
         let filesList = [];
         let currentOrientation = 'portrait';
-        let currentMargin = 0;
-
+        let marginMode = 'no';
         const fileInput = document.getElementById('fileInput');
         const previews = document.getElementById('previews');
         const dropzone = document.getElementById('dropzone');
@@ -190,12 +192,11 @@
             previews.innerHTML = '';
             const count = filesList.length;
             document.getElementById('fileCount').textContent = count;
-            
+           
             if (count > 0) {
                 document.getElementById('previewArea').classList.remove('hidden');
                 document.getElementById('settingsArea').classList.remove('hidden');
             }
-
             filesList.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -237,11 +238,30 @@
             document.getElementById(`btn-${o}`).classList.add('active');
         }
 
-        function setMargin(m) {
-            currentMargin = m;
+        function setMarginMode(mode) {
+            marginMode = mode;
             document.querySelectorAll('[id^="margin-"]').forEach(b => b.classList.remove('active'));
-            document.getElementById(`margin-${m}`).classList.add('active');
+            document.getElementById(`margin-${mode}`).classList.add('active');
+            const customMarginInputs = document.getElementById('customMarginInputs');
+            if (mode === 'custom') {
+                customMarginInputs.classList.remove('hidden');
+            } else {
+                customMarginInputs.classList.add('hidden');
+            }
         }
+
+        // Handle custom page size visibility
+        const pageSizeSelect = document.getElementById('pageSize');
+        const customInputs = document.getElementById('customSizeInputs');
+        function updateCustomInputs() {
+            if (pageSizeSelect.value === 'custom') {
+                customInputs.classList.remove('hidden');
+            } else {
+                customInputs.classList.add('hidden');
+            }
+        }
+        pageSizeSelect.addEventListener('change', updateCustomInputs);
+        updateCustomInputs();
 
         // Initialize Sortable Reordering
         new Sortable(previews, {
@@ -253,21 +273,38 @@
             }
         });
 
-        // --- PDF Generation Logic ---
+        // --- PDF Generation Logic (with new Custom Margin support) ---
         async function generatePDF() {
             if (filesList.length === 0) return alert('Please add some images first.');
-
+            
             const btnText = document.getElementById('btnText');
             const btn = document.getElementById('convertBtn');
             btnText.textContent = 'Processing...';
             btn.disabled = true;
 
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF({
-                orientation: currentOrientation,
-                unit: 'mm',
-                format: document.getElementById('pageSize').value === 'fit' ? 'a4' : document.getElementById('pageSize').value
-            });
+            const pageSizeValue = document.getElementById('pageSize').value;
+            const isFit = pageSizeValue === 'fit';
+            const isCustom = pageSizeValue === 'custom';
+            let customW = isCustom ? parseFloat(document.getElementById('customWidth').value) || 800 : 0;
+            let customH = isCustom ? parseFloat(document.getElementById('customHeight').value) || 600 : 0;
+
+            // === NEW: Get margin values (in px) ===
+            let marginH_px = 0;
+            let marginV_px = 0;
+            if (marginMode === 'no') {
+                marginH_px = 0;
+                marginV_px = 0;
+            } else if (marginMode === 'small') {
+                marginH_px = 10;
+                marginV_px = 10;
+            } else if (marginMode === 'custom') {
+                marginH_px = parseFloat(document.getElementById('marginWidth').value) || 0;
+                marginV_px = parseFloat(document.getElementById('marginHeight').value) || 0;
+            }
+
+            let pdf = null;
+            const dpi = 300;
 
             for (let i = 0; i < filesList.length; i++) {
                 const imgData = await new Promise(resolve => {
@@ -276,21 +313,72 @@
                     reader.readAsDataURL(filesList[i]);
                 });
 
-                const imgProps = pdf.getImageProperties(imgData);
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                
-                const safeW = pageWidth - (currentMargin * 2);
-                const safeH = pageHeight - (currentMargin * 2);
+                const tempImg = new Image();
+                tempImg.src = imgData;
+                await new Promise(resolve => { tempImg.onload = resolve; });
+                const imgW = tempImg.width;
+                const imgH = tempImg.height;
 
-                const ratio = Math.min(safeW / imgProps.width, safeH / imgProps.height);
-                const finalW = imgProps.width * ratio;
-                const finalH = imgProps.height * ratio;
+                let thisFormat;
+                let thisUnit;
+                let thisOrient;
 
-                const x = (pageWidth - finalW) / 2;
-                const y = (pageHeight - finalH) / 2;
+                if (isFit) {
+                    const wMm = (imgW * 25.4) / dpi;
+                    const hMm = (imgH * 25.4) / dpi;
+                    thisFormat = [wMm, hMm];
+                    thisUnit = 'mm';
+                    thisOrient = (wMm > hMm) ? 'landscape' : 'portrait';
+                } else if (isCustom) {
+                    thisFormat = [customW, customH];
+                    thisUnit = 'px';
+                    thisOrient = currentOrientation;
+                } else {
+                    thisFormat = 'a4';
+                    thisUnit = 'mm';
+                    thisOrient = currentOrientation;
+                }
 
-                if (i > 0) pdf.addPage();
+                if (pdf === null) {
+                    pdf = new jsPDF({
+                        orientation: thisOrient,
+                        unit: thisUnit,
+                        format: thisFormat
+                    });
+                } else {
+                    pdf.addPage(thisFormat, thisOrient);
+                }
+
+                let x = 0;
+                let y = 0;
+                let finalW;
+                let finalH;
+
+                if (isFit) {
+                    // Fit = exact image size, no margin, no extra space
+                    x = 0;
+                    y = 0;
+                    finalW = (imgW * 25.4) / dpi;
+                    finalH = (imgH * 25.4) / dpi;
+                } else {
+                    // A4 or Custom size → apply margin
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+
+                    // Convert px margin to correct unit (mm or px)
+                    const pxToMm = 0.264583;
+                    const unitMarginH = (thisUnit === 'mm') ? marginH_px * pxToMm : marginH_px;
+                    const unitMarginV = (thisUnit === 'mm') ? marginV_px * pxToMm : marginV_px;
+
+                    const safeW = pageWidth - (unitMarginH * 2);
+                    const safeH = pageHeight - (unitMarginV * 2);
+                    const ratio = Math.min(safeW / imgW, safeH / imgH) || 1;
+                    finalW = imgW * ratio;
+                    finalH = imgH * ratio;
+                    x = (pageWidth - finalW) / 2;
+                    y = (pageHeight - finalH) / 2;
+                }
+
                 pdf.addImage(imgData, 'JPEG', x, y, finalW, finalH);
             }
 
